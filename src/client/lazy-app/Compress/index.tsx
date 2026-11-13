@@ -5,9 +5,6 @@ import 'add-css:./style.css';
 import {
   blobToImg,
   blobToText,
-  builtinDecode,
-  sniffMimeType,
-  canDecodeImageType,
   abortable,
   assertSignal,
   ImageMimeTypes,
@@ -22,6 +19,7 @@ import {
   EncoderType,
   EncoderOptions,
 } from '../feature-meta';
+import decodeImage from '../util/decode-image';
 import Output from './Output';
 import Options from './Options';
 import ResultCache from './result-cache';
@@ -86,42 +84,6 @@ interface SideJob {
 interface LoadingFileInfo {
   loading: boolean;
   filename?: string;
-}
-
-async function decodeImage(
-  signal: AbortSignal,
-  blob: Blob,
-  workerBridge: WorkerBridge,
-): Promise<ImageData> {
-  assertSignal(signal);
-  const mimeType = await abortable(signal, sniffMimeType(blob));
-  const canDecode = await abortable(signal, canDecodeImageType(mimeType));
-
-  try {
-    if (!canDecode) {
-      if (mimeType === 'image/avif') {
-        return await workerBridge.avifDecode(signal, blob);
-      }
-      if (mimeType === 'image/webp') {
-        return await workerBridge.webpDecode(signal, blob);
-      }
-      if (mimeType === 'image/jxl') {
-        return await workerBridge.jxlDecode(signal, blob);
-      }
-      if (mimeType === 'image/webp2') {
-        return await workerBridge.wp2Decode(signal, blob);
-      }
-      if (mimeType === 'image/qoi') {
-        return await workerBridge.qoiDecode(signal, blob);
-      }
-    }
-    // Otherwise fall through and try built-in decoding for a laugh.
-    return await builtinDecode(signal, blob);
-  } catch (err) {
-    if (err instanceof Error && err.name === 'AbortError') throw err;
-    console.log(err);
-    throw Error("Couldn't decode image");
-  }
 }
 
 async function preprocessImage(
@@ -724,7 +686,9 @@ export default class Compress extends Component<Props, State> {
         });
       } catch (err) {
         if (err instanceof Error && err.name === 'AbortError') return;
-        this.props.showSnack(`Source decoding error: ${err}`);
+        this.props.showSnack(
+          `Source decoding error: ${err instanceof Error ? err.message : err}`,
+        );
         throw err;
       }
     } else {

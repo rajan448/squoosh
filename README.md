@@ -15,6 +15,21 @@ However, Squoosh utilizes Google Analytics to collect the following:
 
 # Developing
 
+HEIC/HEIF still images can be opened using native browser decoding or a local
+WASM fallback. The primary image is converted to 8-bit RGBA for editing;
+HDR, auxiliary images and metadata are not preserved. The fallback accepts up
+to 64 megapixels (up to 256 MiB for RGBA alone, plus decoder memory). Large
+images may exceed a device's available memory. HEIC output is not supported.
+The fallback converts decoded values to 8-bit RGBA without converting embedded
+ICC profiles to sRGB; wide-gamut images (such as Display P3) can look different
+from native browser decoding. Color-managed wide-gamut editing is not supported.
+
+The fallback uses [libheif-js](https://github.com/catdad-experiments/libheif-js)
+1.23.5 under LGPL-3.0, loaded as a separate module. Distributed notices are in
+`src/copy/heic-decoder-licenses.txt`. Run `npm run test:heic` for decoder tests.
+The decoder is cached in the background for offline use; the first load needs
+connectivity until caching is complete.
+
 To develop for Squoosh:
 
 1. Clone the repository

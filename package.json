@@ -4,6 +4,7 @@
   "version": "2.0.0",
   "license": "apache-2.0",
   "scripts": {
+    "test:heic": "node --test tests/heic.test.cjs",
     "build": "rollup -c && node lib/move-output.js",
     "debug": "node --inspect-brk node_modules/.bin/rollup -c",
     "dev": "DEV_PORT=\"${DEV_PORT:=5000}\" run-p watch serve",
@@ -29,6 +30,7 @@
     "husky": "^7.0.2",
     "idb-keyval": "^3.2.0",
     "image-size": "^0.9.3",
+    "libheif-js": "1.23.5",
     "linkstate": "^2.0.0",
     "lint-staged": "^10.5.1",
     "lodash.camelcase": "^4.3.0",

@@ -26,6 +26,7 @@ import * as featuresWorker from 'entry-data:../features-worker';
 // Decoders (some are feature detected)
 import * as avifDec from 'entry-data:codecs/avif/dec/avif_dec';
 import * as webpDec from 'entry-data:codecs/webp/dec/webp_dec';
+import * as heicDec from 'entry-data:features/decoders/heic/shared/decoder';
 
 // AVIF
 import * as avifEncMt from 'entry-data:codecs/avif/enc/avif_enc_mt';
@@ -105,6 +106,7 @@ export const theRest = (async () => {
   }
 
   addWithDeps(featuresWorker);
+  addWithDeps(heicDec);
 
   if (!supportsAvif) addWithDeps(avifDec);
   if (!supportsWebP) addWithDeps(webpDec);

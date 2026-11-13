@@ -19,4 +19,5 @@ jobs:
       with:
         node-version: '${{ steps.nvmrc.outputs.node_version }}'
     - run: npm ci
+    - run: npm run test:heic
     - run: npm run build
